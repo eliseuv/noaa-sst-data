@@ -3,12 +3,6 @@ using Dates, NetCDF, DataFrames, JLD2
 include("NOAA.jl")
 using .NOAA
 
-const REF_PATH = "./data/noaa/raw/sst-oi/1981-09-01.nc"
-# ncinfo(REF_PATH)
-
-latitudes = ncread(REF_PATH, "lat")
-longitudes = ncread(REF_PATH, "lon")
-
 const points = [
     :tramandai => (-30, -50),
     :torres => (-29.34051, -49.71854),
@@ -27,14 +21,9 @@ const points = [
     :caracas => (10.62099, 293.04746),
     :nemo => (-48.876667, -123.393333)]
 
-indices = map(points) do (name, (lat, lon))
-    lat_idx = argmin(abs.(latitudes .- lat))
-    lon_idx = argmin(abs.(longitudes .- ((lon + 360) % 360)))
-    (name => (lat_idx, lon_idx))
-end
-
-df_coords = map(indices) do (name, (i, j))
-    (name=String(name), latitude=latitudes[i], longitude=longitudes[j])
+df_coords = map(points) do (name, coord)
+    coord_approx = approximate_coordinate(coord)
+    (name=String(name), latitude=coord_approx.latitude, longitude=coord_approx.longitude)
 end |> DataFrame
 @show df_coords
 
@@ -45,7 +34,8 @@ for path in readdir("./data/noaa/raw/sst-oi", sort=true, join=true)
     push!(data[:dates], filename_date(path))
     sst_missing = ncgetatt(path, "sst", "_FillValue")
     sst_scale = ncgetatt(path, "sst", "scale_factor")
-    for (name, (i, j)) in indices
+    for (name, coord) in points
+        (i, j) = coord2index(coord)
         sst_raw = dropdims(ncread(path, "sst", start=[j, i, 1, 1], count=[1, 1, 1, 1]), dims=(2, 3, 4))[begin]
         sst = if sst_raw == sst_missing
             missing
