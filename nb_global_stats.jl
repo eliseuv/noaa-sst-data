@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.8
+# v0.20.21
 
 using Markdown
 using InteractiveUtils
@@ -13,56 +13,68 @@ end
 
 # ╔═╡ 06f4e22b-9379-46a8-9477-824aa10f7bee
 begin
-    using Dates, JLD2, DataFrames, CairoMakie
+    using Dates, JLD2, DataFrames, CairoMakie, TimeSeries
     NOAA = ingredients("./NOAA.jl").NOAA
 end
 
 # ╔═╡ abe4a16c-1a7b-448f-8d1a-ac8ebc196fb4
 const df = load_object("./data/noaa/time_series/sst_global_stats.jld2")
 
-# ╔═╡ 52a3b8f6-8d02-43fd-8482-22ff3a41b4c6
-let fig = Figure(),
-	ax = Axis(fig[1,1];
-			 title="Daily Average Temperature")
+# ╔═╡ 9a227d7e-5e88-4e86-bae7-2694deb286d5
+let fig = Figure()
 
-	lines!(ax, df[!,:date], df[!,:mean])
-
+	lines(fig[1,1], df[!,:date], df[!,:mean];
+		  axis=(;
+				xticks=DateTime(1982):Year(6):DateTime(2025),
+		 		ylabel=L"\langle T \rangle", ylabelrotation=0, ylabelsize=20
+			   )
+		 )
+	
 	save("./plots/stats/temp_avg.pdf", fig)
 
 	fig
 end
 
-# ╔═╡ beb61065-c550-4a26-9769-4fff9e5bf999
-let fig = Figure(),
-	ax = Axis(fig[1,1];
-			 title="Daily Temperature Variance")
+# ╔═╡ a1509a2a-a566-4e92-99aa-98c51d5d4142
+let fig = Figure()
 
-	lines!(ax, df[!,:date], df[!,:var])
+	lines(fig[1,1], df[!,:date], df[!,:var];
+		  axis=(;
+				xticks=DateTime(1982):Year(6):DateTime(2025),
+		 		ylabel=L"\text{var}(T)", ylabelrotation=0, ylabelsize=20
+			   )
+		 )
 	
 	save("./plots/stats/temp_var.pdf", fig)
 
 	fig
 end
 
-# ╔═╡ 5a9395ac-105e-4fcc-9f07-6cab53405e83
-let fig = Figure(),
-	ax = Axis(fig[1,1];
-			 title="Daily Temperature Skewness")
+# ╔═╡ 736fd761-aea3-47f7-a5b9-e35e8cd22f73
+let fig = Figure()
 
-	lines!(ax, df[!,:date], df[!,:skewness])
-
-	save("./plots/stats/temp_skewness.pdf", fig)
+	lines(fig[1,1], df[!,:date], df[!,:skewness];
+		  axis=(;
+				xticks=DateTime(1982):Year(6):DateTime(2025),
+		 		ylabel=L"\text{S}(T)", ylabelrotation=0, ylabelsize=20
+			   )
+		 )
 	
+	save("./plots/stats/temp_skewness.pdf", fig)
+
 	fig
 end
 
-# ╔═╡ eaade5b3-51b1-4cfe-b1b8-a14904bc9225
-let fig = Figure(),
-	ax = Axis(fig[1,1];
-			 title="Daily Temperature Kurtosis")
+# ╔═╡ a79f47c5-4f0f-4cd7-9d6e-e59a10f0407f
+let fig = Figure()
 
-	lines!(ax, df[!,:date], df[!,:kurtosis])
-
+	lines(fig[1,1], df[!,:date], df[!,:kurtosis];
+		  axis=(;
+				xticks=DateTime(1982):Year(6):DateTime(2025),
+		 		ylabel=L"\text{K}(T)", ylabelrotation=0, ylabelsize=20
+			   )
+		 )
+	
 	save("./plots/stats/temp_kurtosis.pdf", fig)
 
 	fig
@@ -70,9 +82,9 @@ end
 
 # ╔═╡ Cell order:
 # ╟─545aaffc-f9e6-11ef-3071-a1ea565f5cb0
-# ╟─06f4e22b-9379-46a8-9477-824aa10f7bee
-# ╟─abe4a16c-1a7b-448f-8d1a-ac8ebc196fb4
-# ╠═52a3b8f6-8d02-43fd-8482-22ff3a41b4c6
-# ╠═beb61065-c550-4a26-9769-4fff9e5bf999
-# ╠═5a9395ac-105e-4fcc-9f07-6cab53405e83
-# ╠═eaade5b3-51b1-4cfe-b1b8-a14904bc9225
+# ╠═06f4e22b-9379-46a8-9477-824aa10f7bee
+# ╠═abe4a16c-1a7b-448f-8d1a-ac8ebc196fb4
+# ╠═9a227d7e-5e88-4e86-bae7-2694deb286d5
+# ╠═a1509a2a-a566-4e92-99aa-98c51d5d4142
+# ╠═736fd761-aea3-47f7-a5b9-e35e8cd22f73
+# ╠═a79f47c5-4f0f-4cd7-9d6e-e59a10f0407f
